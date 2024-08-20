@@ -1,0 +1,124 @@
+import time
+
+# Método Naïve
+def poly_naive(A, x):
+    p = 0
+    for i, a in enumerate(A):
+        p += (x ** i) * a
+    return p
+
+# Método Iterativo
+def poly_iter(A, x):
+    p = 0
+    xn = 1
+    for a in A:
+        p += xn * a
+        xn *= x
+    return p
+
+# Regla de Horner
+def poly_horner(A, x):
+    p = A[-1]
+    i = len(A) - 2
+    while i >= 0:
+        p = p * x + A[i]
+        i -= 1
+    return p
+import random
+
+# Ejemplo 1: Polinomio de grado 5
+A1 = [2, 3, 5, 7, 11, 13]
+x1 = 2
+
+# Ejemplo 2: Polinomio de grado 500
+A2 = [random.randint(1, 100) for _ in range(501)]
+x2 = 1.5
+
+# Medición de tiempos
+start = time.time()
+poly_naive(A1, x1)
+print("Naïve (grado 5):", time.time() - start)
+
+start = time.time()
+poly_iter(A1, x1)
+print("Iterativo (grado 5):", time.time() - start)
+
+start = time.time()
+poly_horner(A1, x1)
+print("Horner (grado 5):", time.time() - start)
+
+start = time.time()
+poly_naive(A2, x2)
+print("Naïve (grado 500):", time.time() - start)
+
+start = time.time()
+poly_iter(A2, x2)
+print("Iterativo (grado 500):", time.time() - start)
+
+start = time.time()
+poly_horner(A2, x2)
+print("Horner (grado 500):", time.time() - start)
+#inciso b
+import math
+
+# Serie de Taylor para cos(x)
+def cos_taylor(x, tolerance):
+    suma = 0
+    term = 1  # Primer término de la serie es 1
+    n = 0
+    while abs(term) > tolerance:
+        suma += term
+        n += 1
+        term = (-1) ** n * (x ** (2 * n)) / math.factorial(2 * n)
+    return suma
+
+# Computación parcial para cos(x)
+def cos_partial(x, tolerance):
+    suma = 0
+    term = 1  # Primer término de la serie es 1
+    n = 0
+    while abs(term) > tolerance:
+        suma += term
+        n += 1
+        term *= -x**2 / ((2 * n) * (2 * n - 1))
+    return suma
+import pandas as pd
+
+def generate_table(x, tolerance, method, true_value):
+    n = 0
+    suma = 0
+    term = 1
+    data = []
+    
+    while abs(term) > tolerance:
+        if method == 'taylor':
+            term = (-1) ** n * (x ** (2 * n)) / math.factorial(2 * n)
+        elif method == 'partial':
+            if n > 0:
+                term *= -x**2 / ((2 * n) * (2 * n - 1))
+            else:
+                term = 1
+        
+        suma += term
+        error_rel = abs(suma - true_value) / abs(true_value)
+        data.append([x, n, suma, error_rel])
+        n += 1
+    
+    columns = ['x', 'iteración', 'suma', '|suma - cos(x)|/cos(x)']
+    df = pd.DataFrame(data, columns=columns)
+    return df
+
+# Evaluación directa con math.cos para referencia
+x_values = [0.1, 100]  # Valores pequeños y grandes de x
+tolerances = [1e-4, 1e-8]
+
+for x in x_values:
+    true_value = math.cos(x)
+    for tol in tolerances:
+        print(f"\nTabla de convergencia para cos({x}) con tolerancia {tol} usando la serie de Taylor:")
+        table_taylor = generate_table(x, tol, 'taylor', true_value)
+        print(table_taylor)
+        
+        print(f"\nTabla de convergencia para cos({x}) con tolerancia {tol} usando la computación parcial:")
+        table_partial = generate_table(x, tol, 'partial', true_value)
+        print(table_partial)
