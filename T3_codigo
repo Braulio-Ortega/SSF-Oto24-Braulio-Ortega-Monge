@@ -1,0 +1,42 @@
+import numpy as np
+from scipy.integrate import quad
+from scipy.special import roots_legendre
+
+# Implementación de Gauss-Legendre
+def gauss_legendre(func, a, b, n):
+    nodes, weights = roots_legendre(n)  # Obtiene nodos y pesos para n puntos
+    # Transformación del intervalo [-1, 1] a [a, b]
+    transformed_nodes = 0.5 * (nodes + 1) * (b - a) + a
+    transformed_weights = 0.5 * (b - a) * weights
+    return np.sum(transformed_weights * func(transformed_nodes))
+
+# Función para comparación con scipy
+def integrate_with_scipy(func, a, b):
+    result, _ = quad(func, a, b)
+    return result
+# Función
+def f(x):
+    return x**2
+
+# Límites
+a, b = 0, 1
+
+# Resolviendo con 6 puntos de Gauss-Legendre
+result_gauss = gauss_legendre(f, a, b, 6)
+result_scipy = integrate_with_scipy(f, a, b)
+
+print("Resultado con Gauss-Legendre:", result_gauss)
+print("Resultado con scipy:", result_scipy)
+# Para f(x) = sin(x) entre [0, pi]
+def g(x):
+    return np.sin(x)
+
+a, b = 0, np.pi
+
+# Resultados
+result_gauss_g = gauss_legendre(g, a, b, 6)
+result_scipy_g = integrate_with_scipy(g, a, b)
+
+print("Resultado con Gauss-Legendre:", result_gauss_g)
+print("Resultado con scipy:", result_scipy_g)
+
