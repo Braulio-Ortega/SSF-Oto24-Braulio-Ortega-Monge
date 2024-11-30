@@ -1,0 +1,66 @@
+# Código para reproducir Example 6.1.1 y resolver Problemas 6-0 y 6-2
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+
+def example_6_1_1():
+    def system(t, y):
+        dydt = [-y[0], -2 * y[1]]
+        return dydt
+
+    y0 = [1, 1]
+    t_span = (0, 5)
+    t_eval = np.linspace(*t_span, 100)
+
+    sol = solve_ivp(system, t_span, y0, t_eval=t_eval)
+
+    plt.plot(sol.t, sol.y[0], label="y1 (Example 6.1.1)")
+    plt.plot(sol.t, sol.y[1], label="y2 (Example 6.1.1)")
+    plt.xlabel('t')
+    plt.ylabel('y')
+    plt.legend()
+    plt.title("Example 6.1.1: Sistema de EDOs")
+    plt.grid()
+    plt.show()
+
+def problem_6_0():
+    def f(t, y):
+        return -y + np.sin(t)
+
+    y0 = [0]
+    t_span = (0, 10)
+    t_eval = np.linspace(*t_span, 100)
+
+    sol = solve_ivp(f, t_span, y0, t_eval=t_eval)
+
+    plt.plot(sol.t, sol.y[0], label="Solución (6-0)")
+    plt.xlabel('t')
+    plt.ylabel('y')
+    plt.legend()
+    plt.title("Problema 6-0")
+    plt.grid()
+    plt.show()
+
+def problem_6_2():
+    def system(t, y):
+        dydt = [y[1], -y[0] - 0.1 * y[1]]
+        return dydt
+
+    y0 = [1, 0]
+    t_span = (0, 10)
+    t_eval = np.linspace(*t_span, 100)
+
+    sol = solve_ivp(system, t_span, y0, t_eval=t_eval)
+
+    plt.plot(sol.t, sol.y[0], label="y1 (6-2)")
+    plt.plot(sol.t, sol.y[1], label="y2 (6-2)")
+    plt.xlabel('t')
+    plt.ylabel('y')
+    plt.legend()
+    plt.title("Problema 6-2: Sistema Extendido")
+    plt.grid()
+    plt.show()
+
+example_6_1_1()
+problem_6_0()
+problem_6_2()
