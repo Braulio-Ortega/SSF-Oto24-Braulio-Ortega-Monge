@@ -1,0 +1,58 @@
+# Código para realizar las simulaciones y obtener los resultados requeridos para el informe.
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Funciones del sistema
+def f(t, y, k):
+    x, v = y
+    dxdt = v
+    dvdt = -k * x**3
+    return np.array([dxdt, dvdt])
+
+# Método de Runge-Kutta de cuarto orden
+def runge_kutta(f, y0, t0, tf, h, k):
+    t = np.arange(t0, tf, h)
+    y = np.zeros((len(t), len(y0)))
+    y[0] = y0
+    for i in range(1, len(t)):
+        k1 = f(t[i-1], y[i-1], k)
+        k2 = f(t[i-1] + h/2, y[i-1] + h/2 * k1, k)
+        k3 = f(t[i-1] + h/2, y[i-1] + h/2 * k2, k)
+        k4 = f(t[i-1] + h, y[i-1] + h * k3, k)
+        y[i] = y[i-1] + h/6 * (k1 + 2*k2 + 2*k3 + k4)
+    return t, y
+
+# Configuración de parámetros
+k_values_intervals = [
+    np.linspace(0.01, 1, 10),  # Intervalo 1
+    np.linspace(1, 25, 10),   # Intervalo 2
+    np.linspace(30, 200, 10)  # Intervalo 3
+]
+h_values = [0.01, 0.005, 0.001]  # Tamaño de paso
+y0 = [1, 0]  # Condiciones iniciales [x0, v0]
+interval = (0, 20)  # Intervalo de tiempo
+results = []  # Almacenar resultados para análisis
+
+# Simulaciones y recopilación de resultados
+for h in h_values:
+    for k_set in k_values_intervals:
+        for k in k_set:
+            t, y = runge_kutta(f, y0, interval[0], interval[1], h, k)
+            results.append((k, h, t, y[:, 0]))
+
+# Visualización para cada valor de h y k
+for h in h_values:
+    plt.figure(figsize=(12, 8))
+    for k_set in k_values_intervals:
+        for k in k_set:
+            for result in results:
+                if result[0] == k and result[1] == h:
+                    t, x = result[2], result[3]
+                    plt.plot(t, x, label=f"k={k:.2f}, h={h}")
+    plt.title(f"Oscilador no lineal con h={h}")
+    plt.xlabel("Tiempo")
+    plt.ylabel("Posición")
+    plt.legend(loc='upper right', fontsize='small')
+    plt.grid()
+    plt.show()
